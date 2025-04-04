@@ -1,0 +1,626 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for LLM panel components */
+.llm-panel textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e0e7ff;
+  min-height: 3rem;
+  max-height: 8rem;
+  resize: none;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  transition: all 0.2s ease;
+  background-color: #f9fafb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.llm-panel textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.llm-panel textarea::placeholder {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.llm-panel .send-button {
+  background-color: #4f46e5;
+  color: white;
+  border-radius: 0.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border: none;
+  padding: 0;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.3);
+}
+
+/* Global styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+  width: 100%;
+}
+
+body {
+  @apply bg-slate-50;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  color: #333;
+}
+
+/* Layout Styles */
+.main-content-area {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: hidden; /* Let child elements handle scrolling */
+}
+
+/* When resizing the sidebar */
+body.resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.app-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  @apply bg-gradient-to-br from-slate-50 to-indigo-50;
+}
+
+.glass-panel {
+  @apply bg-white bg-opacity-80 backdrop-blur-lg;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+  border-top: none; 
+  border-right: none;
+}
+
+.content-area {
+  @apply p-8 bg-white rounded-xl shadow-sm;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.nav-style {
+  @apply bg-white bg-opacity-90 backdrop-blur-md shadow-sm;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  position: sticky;
+  top: 0;
+  z-index: 20; 
+  right: 0;
+  left: 0;
+}
+
+.agent-card {
+  @apply bg-white rounded-xl shadow-md transition-all duration-300 hover:shadow-lg;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+}
+
+.btn-primary {
+  @apply bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition-colors duration-300;
+}
+
+.btn-secondary {
+  @apply bg-white text-indigo-600 border border-indigo-200 px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-50 transition-colors duration-300;
+}
+
+.text-gradient {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600;
+}
+
+/* Style for the resize handle */
+.resize-handle {
+  width: 4px;
+  background-color: transparent;
+  cursor: col-resize;
+  position: absolute;
+  top: 0; /* Now starts from the top */
+  bottom: 0;
+  left: 0;
+  transition: background-color 0.2s;
+  z-index: 5; /* Ensure it's clickable */
+}
+
+.resize-handle:hover,
+.resize-handle.active {
+  background-color: rgba(99, 102, 241, 0.5);
+}
+
+/* Re-style buttons for our layout */
+button {
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.5);
+  outline-offset: 2px;
+}
+
+/* Adjust for smaller screens */
+@media screen and (max-width: 768px) {
+  .content-area {
+    padding: 1rem;
+  }
+  /* Maybe hide sidebar or make it overlay on small screens */
+}
+
+/* Custom styles for sales action buttons */
+.sales-button {
+  @apply bg-white border border-gray-200 rounded-lg p-4 my-3 shadow-sm hover:shadow-md transition-all duration-200;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 12px;
+  position: relative;
+}
+
+.sales-button::after {
+  content: "";
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.sales-button input {
+  @apply border border-gray-200 rounded-md p-2 text-sm;
+  background-color: #f9fafb;
+}
+
+.sales-button input:focus {
+  @apply outline-none border-blue-400 ring-2 ring-blue-100;
+}
+
+.sales-button input:first-of-type {
+  grid-column: 1 / 3;
+}
+
+.sales-button button {
+  @apply bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition-colors;
+  grid-column: 1 / -1;
+}
+
+.sales-button .input-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sales-button .full-width {
+  grid-column: 1 / -1;
+}
+
+/* Sales button processed style */
+.sales-button-processed {
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.sales-button-processed > div {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Flash highlight effect for form fields */
+@keyframes flashHighlight {
+  0% {
+    background-color: #ffffff;
+    border-color: #e5e7eb;
+  }
+  30% {
+    background-color: #eef2ff;
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+  70% {
+    background-color: #eef2ff;
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+  100% {
+    background-color: #ffffff;
+    border-color: #e5e7eb;
+  }
+}
+
+.flash-highlight {
+  animation: flashHighlight 1.5s ease;
+}
+
+/* Disabled submit button styling */
+.sales-button button:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+
+/* Custom overrides for llmasaservice-ui components to match our app's style */
+:root {
+  --prompt-background-color: #eef2ff !important; /* indigo-50 */
+  --prompt-text-color: #4f46e5 !important; /* indigo-600 */
+  --response-background-color: #ffffff !important;
+  --response-text-color: #333 !important;
+  --input-background-color: #f9fafb !important; /* gray-50 */
+  --input-border-color: #e0e7ff !important; /* indigo-100 */
+  --input-text-color: #333 !important;
+  --button-background-color: #4f46e5 !important; /* indigo-600 */
+  --button-border-color: #4f46e5 !important; /* indigo-600 */
+  --button-text-color: #ffffff !important;
+  --button-background-color-hover: #4338ca !important; /* indigo-700 */
+  --button-text-color-hover: #ffffff !important;
+  --button-disabled-color: #9ca3af !important; /* gray-400 */
+  --button-disabled-background-color: #e0e7ff !important; /* indigo-100 */
+  --button-action-background-color: transparent !important;
+  --button-action-text-color: #6366f1 !important; /* indigo-500 */
+  --button-drop-shadow: 0 1px 3px rgba(79, 70, 229, 0.3) !important;
+  --button-scroll-background-color: #6366f1 !important; /* indigo-500 */
+  --button-scroll-text-color: #ffffff !important;
+  --button-scroll-background-color-hover: #4f46e5 !important; /* indigo-600 */
+  --background-color: transparent !important;
+  --title-text-color: #4b5563 !important; /* gray-600 */
+  --title-background-color: transparent !important;
+  --title-divider-color: #e0e7ff !important; /* indigo-100 */
+  --table-border-color: #e0e7ff !important; /* indigo-100 */
+}
+
+/* Custom styles for Agent Panel overrides */
+.llm-panel {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Modify the input styles to match our existing components */
+.llm-panel .chat-input {
+  width: 100% !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 0.75rem !important;
+  border: 1px solid #e0e7ff !important;
+  min-height: 3rem !important;
+  max-height: 8rem !important;
+  resize: none !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+  transition: all 0.2s ease !important;
+  background-color: #f9fafb !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  margin: 0 !important;
+}
+
+.llm-panel .chat-input:focus {
+  outline: none !important;
+  border-color: #6366f1 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+}
+
+.llm-panel .chat-input::placeholder {
+  color: #9ca3af !important;
+  font-size: 0.875rem !important;
+}
+
+/* Style the send button to match our design */
+.llm-panel .send-button {
+  background-color: #4f46e5 !important;
+  color: white !important;
+  border-radius: 0.75rem !important;
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.3) !important;
+  margin: 0 !important;
+}
+
+.llm-panel .send-button:hover {
+  background-color: #4338ca !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.4) !important;
+}
+
+.llm-panel .send-button:disabled {
+  background-color: #e0e7ff !important;
+  color: #9ca3af !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Style the prompt/response elements to match our app */
+.llm-panel .prompt {
+  background-color: #eef2ff !important; /* indigo-50 */
+  color: #4b5563 !important; /* gray-600 */
+  border-radius: 1rem 1rem 1rem 0.25rem !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+  margin-right: 10% !important; 
+  margin-left: 0 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.llm-panel .response {
+  background-color: transparent !important;
+  color: #333 !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Style the history entries with a nicer layout */
+.llm-panel .history-entry {
+  margin-bottom: 1rem !important;
+  border-radius: 0.5rem !important;
+  background-color: transparent !important;
+}
+
+/* Style the response area */
+.llm-panel .responseArea {
+  background-color: transparent !important;
+  padding: 0.75rem !important;
+  margin-top: 0.5rem !important;
+  max-height: calc(100vh - 200px) !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #e0e7ff transparent !important;
+}
+
+.llm-panel .responseArea::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.llm-panel .responseArea::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.llm-panel .responseArea::-webkit-scrollbar-thumb {
+  background-color: #e0e7ff !important;
+  border-radius: 6px !important;
+  border: 2px solid transparent !important;
+}
+
+.llm-panel .responseArea::-webkit-scrollbar-thumb:hover {
+  background-color: #c7d2fe !important;
+}
+
+/* Adjust the copy and thumbs buttons */
+.llm-panel .copy-button,
+.llm-panel .thumbs-button {
+  color: #6366f1 !important;
+  opacity: 0.7 !important;
+  transition: all 0.2s ease !important;
+}
+
+.llm-panel .copy-button:hover,
+.llm-panel .thumbs-button:hover {
+  color: #4f46e5 !important;
+  opacity: 1 !important;
+  background-color: #eef2ff !important;
+}
+
+/* Custom input container styling */
+.llm-panel .input-container {
+  border-top: 1px solid #e0e7ff !important;
+  padding-top: 0.75rem !important;
+  margin-top: 0.5rem !important;
+  background-color: transparent !important;
+}
+
+/* Style suggestion buttons to match our app's UI */
+.llm-panel .suggestion-button {
+  background-color: #f9fafb !important;
+  border: 1px solid #e0e7ff !important;
+  color: #4f46e5 !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.75rem !important;
+  transition: all 0.2s ease !important;
+  margin-right: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.llm-panel .suggestion-button:hover {
+  background-color: #eef2ff !important;
+  border-color: #c7d2fe !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Style any tables in responses to match our app's style */
+.llm-panel table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  margin-bottom: 1rem !important;
+  font-size: 0.875rem !important;
+  border: 1px solid #e0e7ff !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
+}
+
+.llm-panel th,
+.llm-panel td {
+  border: 1px solid #e0e7ff !important;
+  padding: 0.5rem 0.75rem !important;
+  text-align: left !important;
+}
+
+.llm-panel th {
+  background-color: #eef2ff !important;
+  font-weight: 600 !important;
+  color: #4b5563 !important;
+}
+
+/* Style for the powered by footer */
+.powered-by {
+  margin-top: 0.75rem !important;
+  font-size: 0.75rem !important;
+  color: #9ca3af !important;
+  text-align: center !important;
+}
+
+.powered-by a {
+  color: #6366f1 !important;
+  text-decoration: none !important;
+}
+
+.powered-by a:hover {
+  text-decoration: underline !important;
+}
+
+/* Form Context Button Styles */
+.form-context {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0.75rem 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.form-context:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.form-context:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.form-context::after {
+  content: 'Apply';
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background-color: #4f46e5;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  opacity: 0;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-context:hover::after {
+  opacity: 1;
+}
+
+.form-context .field-label {
+  font-weight: 600;
+  color: #4f46e5;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.form-context .field-value {
+  color: #1e293b;
+  background: #f8fafc;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  width: 100%;
+  border: 1px solid #f1f5f9;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Style for formatted values with newlines */
+.form-context .field-value .formatted-value {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Ensure proper spacing between lines */
+.form-context .field-value br {
+  content: "";
+  display: block;
+  margin: 0.5rem 0;
+}
+
+/* Field Updated Animation */
+@keyframes fieldUpdated {
+  0% {
+    background-color: #ffffff;
+    border-color: #e2e8f0;
+  }
+  50% {
+    background-color: #eef2ff;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+  100% {
+    background-color: #ffffff;
+    border-color: #e2e8f0;
+  }
+}
+
+.field-updated {
+  animation: fieldUpdated 1.5s ease-in-out;
+}
+
+/* Container for form-context buttons */
+p:has(.form-context) {
+  margin: 0;
+  padding: 0;
+}
+
+/* Add spacing between consecutive form-context buttons */
+.form-context + .form-context {
+  margin-top: 1rem;
+}
