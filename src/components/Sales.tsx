@@ -1,4 +1,4 @@
-import { DollarSign, Users, LineChart, Briefcase, PieChart, Building, Target, Package, Info, Clipboard, X, Check, BookOpen, Sparkles } from 'lucide-react';
+import { DollarSign, Users, LineChart, Briefcase, PieChart, Target, Info, Clipboard, X, Check, BookOpen, Sparkles } from 'lucide-react';
 import { BackNavigation } from './common/BackNavigation';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -38,9 +38,6 @@ const processSalesButtons = (
     
     // Mark as processed
     button.classList.add('sales-button-processed');
-    
-    // Save original content
-    const originalContent = button.innerHTML;
     
     // Try to find if there was a match that triggered this button
     // We'll look for data attributes that might be set by the AI framework
@@ -128,13 +125,6 @@ const processSalesButtons = (
       currentSalesContext.prospectCompany = company;
       updateAgentContextData('sales', currentSalesContext);
       
-      const data = {
-        name: nameInput.value,
-        email: emailInput.value,
-        company: companyInput.value,
-        originalContent
-      };
-      
       // Find the lead qualification form fields
       const contactNameField = document.getElementById('contactName') as HTMLInputElement;
       const contactEmailField = document.getElementById('contactEmail') as HTMLInputElement;
@@ -204,17 +194,6 @@ const processSalesButtons = (
   });
 };
 
-// Add an interface for the chat history
-interface ChatHistoryEntry {
-  content: string;
-  callId: string;
-  prompt?: string;
-  response?: string;
-}
-
-interface ChatHistory {
-  [key: string]: ChatHistoryEntry;
-}
 
 // First, let's add a new interface for conversation messages
 interface ConversationMessage {
@@ -247,12 +226,6 @@ export function Sales() {
   
   // Create a ref to track if we've already set the context
   const contextSetRef = useRef(false);
-  
-  // State for chat history
-  const [chatHistory, setChatHistory] = useState<ChatHistory>({});
-  
-  // State for callback data
-  const [callbackData, setCallbackData] = useState<{ match: string; groups: any[] } | null>(null);
   
   // State for BANT analysis
   const [isProcessingBant, setIsProcessingBant] = useState(false);
@@ -531,10 +504,7 @@ ConverseAI CRM isn't just a tool; it's your tireless virtual assistant, ensuring
   }, [addInsight]);
 
   // Define callback function for pattern matching
-  function actionCallback(match: string, groups: any[]) {
-    // Store the data but don't show the modal
-    setCallbackData({ match, groups });
-    
+  function actionCallback(_match: string, _groups: any[]) {
     // Process sales buttons after the DOM updates
     setTimeout(() => {
       processSalesButtons(
@@ -544,7 +514,7 @@ ConverseAI CRM isn't just a tool; it's your tireless virtual assistant, ensuring
         setProspectEmail,
         setProspectCompany
       );
-    }, 100);
+    }, 0);
   }
 
   // Callback when a response is complete: just updates history and flags for analysis

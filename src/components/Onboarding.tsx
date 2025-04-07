@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { UserPlus, Briefcase, Award, Book, ChevronDown, ChevronUp, Copy, Check, Plus, Trash2, Link, Mail, Globe, Linkedin, Twitter, Github, Calendar, Clock, Tag, BriefcaseIcon, FileText, Star, Building, Users, Settings, BookOpen, X, Sparkles, ArrowRight } from 'lucide-react';
+import { UserPlus, ChevronDown, ChevronUp, Plus, Trash2, Link, Mail, Globe, Linkedin, Twitter, Github, FileText, Star, Settings, BookOpen, X, Sparkles, ArrowRight } from 'lucide-react';
 import { BackNavigation } from './common/BackNavigation';
 import { useAgent } from '../context/AgentContext';
 
@@ -45,17 +45,7 @@ const getFriendlyFieldName = (path: string): string => {
   
   if (pathParts.length < 2) return path;
   
-  const section = pathParts[0];
   const field = pathParts[1];
-  
-  // Map of friendly names for sections
-  const sectionNames: Record<string, string> = {
-    'basicInfo': 'Basic Info',
-    'contactLinks': 'Contact',
-    'narrativeBio': 'Bio',
-    'expertise': 'Expertise',
-    'services': 'Services'
-  };
   
   // Map of friendly names for fields
   const fieldNames: Record<string, string> = {
@@ -78,8 +68,7 @@ const getFriendlyFieldName = (path: string): string => {
     'engagementModel': 'Engagement Model'
   };
   
-  // Get the friendly names
-  const friendlySection = sectionNames[section] || section;
+  // Get the friendly field name
   const friendlyField = fieldNames[field] || field;
   
   // Return the friendly field name
@@ -103,8 +92,8 @@ const cleanQuotedValue = (value: string): string => {
 
 // Helper function to process form context elements
 const processFormContextElements = (
-  agentContextData: any,
-  updateAgentContextData: (agentId: string, data: any) => void,
+  _agentContextData: any,
+  _updateAgentContextData: (agentId: string, data: any) => void,
   setFormData: React.Dispatch<React.SetStateAction<FormData>>,
 ) => {
   // Find all elements with the form-context class
@@ -235,9 +224,6 @@ const processFormContextElements = (
 export function Onboarding() {
   // Form state
   const [expandedSection, setExpandedSection] = useState<string | null>('basic');
-  const [copied, setCopied] = useState<boolean>(false);
-  const [pastedBio, setPastedBio] = useState<string>('');
-  const [isProcessingBio, setIsProcessingBio] = useState<boolean>(false);
   const [showInstructionsModal, setShowInstructionsModal] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(true);
   const [activeInstructionTab, setActiveInstructionTab] = useState<'instructions' | 'context'>('instructions');
@@ -346,7 +332,7 @@ export function Onboarding() {
   };
   
   // Define callback function for pattern matching
-  const actionCallback = useCallback((match: string, groups: any[]) => {
+  const actionCallback = useCallback((_match: string, _groups: any[]) => {
     // Process form context elements after the DOM updates
     setTimeout(() => {
       processFormContextElements(
@@ -651,32 +637,6 @@ export function Onboarding() {
     });
   }, [agentContextData, updateAgentContextData]);
   
-  // Handle pasted bio
-  const handlePastedBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPastedBio(e.target.value);
-  };
-  
-  // Process the pasted bio with the AI agent
-  const processPastedBio = () => {
-    if (!pastedBio.trim()) return;
-    
-    setIsProcessingBio(true);
-    
-    // Send the pasted bio to the AI agent for processing
-    updateAgentContextData('onboarding', { 
-      ...agentContextData['onboarding'],
-      processBio: pastedBio
-    });
-    
-    // Clear the pasted bio after sending
-    setPastedBio('');
-    
-    // Reset the processing state after a delay
-    setTimeout(() => {
-      setIsProcessingBio(false);
-    }, 2000);
-  };
-  
   // Toggle section expansion
   const toggleSection = (section: string) => {
     if (expandedSection === section) {
@@ -712,13 +672,6 @@ export function Onboarding() {
     const updatedLinks = [...formData.otherLinks];
     updatedLinks.splice(index, 1);
     setFormData(prev => ({ ...prev, otherLinks: updatedLinks }));
-  };
-  
-  // Copy content to clipboard
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
   
   // Parse comma or newline separated text into array

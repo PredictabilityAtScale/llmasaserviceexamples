@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Bot, Info, X, ChevronRight, ChevronLeft, Sparkles, Settings, Cpu, Code, UserPlus, Clock } from 'lucide-react';
 import { AgentPanel } from 'llmasaservice-ui';
 import { useAgent } from '../../context/AgentContext';
@@ -371,7 +371,7 @@ export function AgentSidebar({
 
             {/* Agent Panel itself */} 
             <div className="flex-1 min-h-0 overflow-hidden bg-white">
-              {visibleAgents.map((agent, index) => {
+              {visibleAgents.map((agent) => {
                 const isActive = agent.id === activeAgent;
                 const agentData = agentContextData[agent.id];
                 
@@ -379,7 +379,7 @@ export function AgentSidebar({
                 let agentPanelData: { key: string; data: string }[] = [];
                 if (agentData) {
                   agentPanelData = Object.entries(agentData)
-                    .filter(([key, value]) => 
+                    .filter(([key]) => 
                       key !== 'salesActions' && 
                       key !== 'responseCompleteCallback'
                     )
