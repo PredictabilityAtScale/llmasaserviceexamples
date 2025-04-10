@@ -282,10 +282,7 @@ const processOptionsButtons = (
 };
 
 // Helper function to process task buttons
-const processTaskButtons = (
-  agentContextData: any,
-  updateAgentContextData: (agentId: string, data: any) => void,
-) => {
+const processTaskButtons = () => {
   // Find all elements with the task-button class
   const taskButtons = document.querySelectorAll('.task-button');
   
@@ -524,10 +521,10 @@ export function Main() {
 
   // Effect for processing task buttons dynamically
   useEffect(() => {
-    processTaskButtons(agentContextData, updateAgentContextData);
+    processTaskButtons();
     
     const interval = setInterval(() => {
-      processTaskButtons(agentContextData, updateAgentContextData);
+      processTaskButtons();
     }, 250);
     
     return () => clearInterval(interval);
