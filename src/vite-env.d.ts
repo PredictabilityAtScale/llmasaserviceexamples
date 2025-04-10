@@ -24,8 +24,14 @@ declare module 'llmasaservice-ui' {
       id: string;
       name: string;
       action: () => void;
+      pattern?: string;
+      callback?: (matches: string[]) => void;
     }[];
     url?: string;
+    historyChangedCallback?: (history: { [key: string]: { content: string; callId: string } }) => void;
+    responseCompleteCallback?: (callId: string, prompt: string, response: string) => void;
+    followOnPrompt?: string | null;
+    onFollowOnPromptSent?: () => void;
   }
   
   export const AgentPanel: React.FC<AgentPanelProps>;

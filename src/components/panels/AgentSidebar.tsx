@@ -426,7 +426,9 @@ export function AgentSidebar({
                             ? agentData?.salesActions || [] 
                             : agent.id === 'onboarding' 
                               ? agentData?.onboardingActions || [] 
-                              : []
+                              : agent.id === 'llmaserviceinfo'
+                                ? agentData?.demoActions || []
+                                : []
                         }
                         // @ts-ignore Using props that may not be in the type definition yet
                         historyChangedCallback={handleHistoryChanged}
