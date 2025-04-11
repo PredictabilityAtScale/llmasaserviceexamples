@@ -1,18 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
 
 const ExampleForm: React.FC = () => {
-  const [response, setResponse] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Check URL parameters for form submission
-    const params = new URLSearchParams(window.location.search);
-    const responseParam = params.get('surveyResponse');
-    
-    if (responseParam) {
-      setResponse(responseParam);
-    }
-  }, []);
+  // Get the response from URL parameters
+  const params = new URLSearchParams(window.location.search);
+  const response = params.get('surveyResponse');
 
   if (response) {
     return (
@@ -36,18 +28,9 @@ const ExampleForm: React.FC = () => {
         <h2 className="text-2xl font-semibold text-gray-900 mb-4">
           Survey Response
         </h2>
-        <p className="text-lg text-gray-600 mb-6">
-          Please submit your response using the form on the external website.
+        <p className="text-lg text-gray-600">
+          This page accepts form submissions from external websites.
         </p>
-        <div className="text-sm text-gray-500">
-          <p>To submit a response, use this HTML form on your website:</p>
-          <pre className="mt-2 p-2 bg-gray-50 rounded overflow-x-auto">
-            {`<form action="https://examples.llmasaservice.io/exampleform" method="GET">
-  <input type="hidden" name="surveyResponse" value="Your response here">
-  <button type="submit">Submit Response</button>
-</form>`}
-          </pre>
-        </div>
       </div>
     </div>
   );
