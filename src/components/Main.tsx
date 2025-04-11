@@ -455,36 +455,14 @@ export function Main() {
     }
   ], [actionCallback]);
   
-  // Update agent context with demo actions
+  // Update agent context with demo actions - only once on mount
   useEffect(() => {
-    updateAgentContextData('llmaserviceinfo', { 
-      demoActions 
-    });
-  }, [updateAgentContextData, demoActions]);
+    updateAgentContextData('llmaserviceinfo', { demoActions });
+  }, []); // Empty dependency array since we only want this to run once
 
   // Effect for processing sales buttons dynamically
   useEffect(() => {
-    processSalesButtons(
-      agentContextData,
-      updateAgentContextData,
-      (name) => {
-        const currentSalesContext = { ...agentContextData['sales'] };
-        currentSalesContext.prospectName = name;
-        updateAgentContextData('sales', currentSalesContext);
-      },
-      (email) => {
-        const currentSalesContext = { ...agentContextData['sales'] };
-        currentSalesContext.prospectEmail = email;
-        updateAgentContextData('sales', currentSalesContext);
-      },
-      (company) => {
-        const currentSalesContext = { ...agentContextData['sales'] };
-        currentSalesContext.prospectCompany = company;
-        updateAgentContextData('sales', currentSalesContext);
-      }
-    );
-    
-    const interval = setInterval(() => {
+    const processSales = () => {
       processSalesButtons(
         agentContextData,
         updateAgentContextData,
@@ -504,32 +482,46 @@ export function Main() {
           updateAgentContextData('sales', currentSalesContext);
         }
       );
-    }, 250);
+    };
+
+    // Initial processing
+    processSales();
+    
+    // Set up interval for periodic processing
+    const interval = setInterval(processSales, 250);
     
     return () => clearInterval(interval);
   }, [agentContextData, updateAgentContextData]);
 
   // Effect for processing options buttons dynamically
   useEffect(() => {
-    processOptionsButtons(agentContextData, updateAgentContextData);
-    
-    const interval = setInterval(() => {
+    const processOptions = () => {
       processOptionsButtons(agentContextData, updateAgentContextData);
-    }, 250);
+    };
+
+    // Initial processing
+    processOptions();
+    
+    // Set up interval for periodic processing
+    const interval = setInterval(processOptions, 250);
     
     return () => clearInterval(interval);
   }, [agentContextData, updateAgentContextData]);
 
   // Effect for processing task buttons dynamically
   useEffect(() => {
-    processTaskButtons();
-    
-    const interval = setInterval(() => {
+    const processTasks = () => {
       processTaskButtons();
-    }, 250);
+    };
+
+    // Initial processing
+    processTasks();
+    
+    // Set up interval for periodic processing
+    const interval = setInterval(processTasks, 250);
     
     return () => clearInterval(interval);
-  }, [agentContextData, updateAgentContextData]);
+  }, []); // Empty dependency array since processTaskButtons doesn't depend on any state
 
   // If an agent is selected, show their content
   if (activeAgent) {
@@ -550,12 +542,14 @@ export function Main() {
     // If no agent is selected (like when clicking "Back to Agents"), set it to llmaserviceinfo
     setActiveAgent('llmaserviceinfo');
   }
-
+  
   // Show the welcome screen with agent cards
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Add route for example form */}
+    {console.log("window.location.pathname =" + window.location.pathname)}
       {window.location.pathname === '/exampleform' ? (
+          
         <ExampleForm />
       ) : (
         <div className="flex flex-col h-full">
