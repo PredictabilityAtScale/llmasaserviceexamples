@@ -3,7 +3,7 @@ import { useAgent } from '../context/AgentContext';
 import { Sales } from './Sales';
 import { Onboarding } from './Onboarding';
 import ExampleForm from './examples/ExampleForm';
-import { useCallback, useMemo, useEffect, useState } from 'react';
+import { useCallback, useMemo, useEffect } from 'react';
 import md5 from 'md5';
 
 // Helper function to process sales buttons
@@ -377,9 +377,6 @@ const processTaskButtons = () => {
 
 export function Main() {
   const { activeAgent, setActiveAgent, updateAgentContextData, agentContextData } = useAgent();
-  const [prospectName, setProspectName] = useState<string | null>(null);
-  const [prospectEmail, setProspectEmail] = useState<string | null>(null);
-  const [prospectCompany, setProspectCompany] = useState<string | null>(null);
 
   // Define callback function for pattern matching
   const actionCallback = useCallback((_match: string, _groups: any[]) => {
