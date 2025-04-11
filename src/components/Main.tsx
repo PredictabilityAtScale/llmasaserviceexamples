@@ -458,6 +458,9 @@ export function Main() {
   // Update agent context with demo actions - only once on mount
   useEffect(() => {
     updateAgentContextData('llmaserviceinfo', { demoActions });
+       
+        console.log("window.location.pathname =" + window.location.pathname);
+        
   }, []); // Empty dependency array since we only want this to run once
 
   // Effect for processing sales buttons dynamically
@@ -546,8 +549,7 @@ export function Main() {
   // Show the welcome screen with agent cards
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Add route for example form */}
-    {console.log("window.location.pathname =" + window.location.pathname)}
+  
       {window.location.pathname === '/exampleform' ? (
           
         <ExampleForm />
