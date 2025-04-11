@@ -1,29 +1,48 @@
 .survey-action {
-  @apply bg-white border border-gray-200 rounded-lg p-4 my-3 shadow-sm hover:shadow-md transition-all duration-200;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   position: relative;
   min-width: 300px;
+  transition: all 0.2s ease-in-out;
+}
+
+.survey-action:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .survey-title {
-  @apply text-sm font-medium text-blue-600 mb-3;
   font-size: 1rem;
   font-weight: 600;
+  color: #2563eb;
+  margin-bottom: 0.75rem;
 }
 
 .survey-options {
-  @apply flex flex-col gap-2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   margin: 0.5rem 0;
 }
 
 .survey-option {
-  @apply flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer transition-colors;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
   background-color: #ffffff;
   width: 100%;
   text-align: left;
   font-size: 0.875rem;
   color: #1e293b;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
 .survey-option:hover {
@@ -35,14 +54,14 @@
   transform: translateY(1px);
 }
 
-/* Add a subtle success state for when an option is selected */
+/* Selected state for when an option is chosen */
 .survey-option.selected {
   background-color: #eef2ff;
   border-color: #6366f1;
   color: #4f46e5;
 }
 
-/* Add a subtle animation for when an option is selected */
+/* Animation for when an option is selected */
 @keyframes optionSelected {
   0% {
     background-color: #ffffff;
