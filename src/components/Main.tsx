@@ -460,7 +460,7 @@ export function Main() {
     updateAgentContextData('llmaserviceinfo', { demoActions });
        
         console.log("window.location.pathname =" + window.location.pathname);
-        
+
   }, []); // Empty dependency array since we only want this to run once
 
   // Effect for processing sales buttons dynamically
@@ -550,7 +550,7 @@ export function Main() {
   return (
     <div className="container mx-auto px-4 py-8">
   
-      {window.location.pathname === '/exampleform' ? (
+      {window.location.pathname.startsWith('/exampleform') ? (
           
         <ExampleForm />
       ) : (
