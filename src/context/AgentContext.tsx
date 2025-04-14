@@ -6,9 +6,6 @@ export interface AgentContextData {
   [agentId: string]: any;
 }
 
-// Define the type for the updater function
-type AgentContextUpdater = (prevData: AgentContextData) => AgentContextData;
-
 interface AgentContextType {
   activeAgent: AgentType;
   setActiveAgent: (agent: AgentType) => void;
