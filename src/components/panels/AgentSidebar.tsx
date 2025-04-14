@@ -375,12 +375,16 @@ export function AgentSidebar({
                 const isActive = agent.id === activeAgent;
                 const agentData = agentContextData[agent.id];
                 
-                // For sales agents, add prospect information from context
+                // --- Prepare agent data for the panel ---
                 let agentPanelData: { key: string; data: string }[] = [];
                 if (agentData) {
                   agentPanelData = Object.entries(agentData)
                     .filter(([key]) => 
+                      // Exclude action arrays and callbacks from the displayed data
                       key !== 'salesActions' && 
+                      key !== 'onboardingActions' && 
+                      key !== 'demoActions' && 
+                      key !== 'agentConfigActions' &&
                       key !== 'responseCompleteCallback'
                     )
                     .map(([key, value]) => ({
@@ -389,7 +393,7 @@ export function AgentSidebar({
                     }));
                 }
 
-                // Add prospect information to the data array for the "sales" agent
+                // Add prospect info for sales agent
                 if (agent.id === 'sales') {
                   // Add prospect information if available
                   if (prospectName) {
@@ -411,6 +415,24 @@ export function AgentSidebar({
                     });
                   }
                 }
+
+                // --- Determine actions for the panel ---
+                let panelActions = [];
+                if (agentData) {
+                  if (agent.id === 'sales') {
+                    panelActions = agentData.salesActions || [];
+                  } else if (agent.id === 'onboarding') {
+                    panelActions = agentData.onboardingActions || [];
+                  } else if (agent.id === 'llmaserviceinfo') {
+                    // Combine demoActions and agentConfigActions if they exist
+                    const demoActions = agentData.demoActions || [];
+                    const configActions = agentData.agentConfigActions || [];
+                    panelActions = [...demoActions, ...configActions]; 
+                  } else {
+                    // Default or handle other agent types if necessary
+                    panelActions = agentData.actions || []; // Assuming a generic 'actions' key if others aren't present
+                  }
+                }
                 
                 return (
                   <div 
@@ -421,23 +443,10 @@ export function AgentSidebar({
                       <AgentPanel
                         agent={agent.agentId}
                         data={agentPanelData}
-                        actions={
-                          agent.id === 'sales' 
-                            ? agentData?.salesActions || [] 
-                            : agent.id === 'onboarding' 
-                              ? agentData?.onboardingActions || [] 
-                              : agent.id === 'llmaserviceinfo'
-                                ? agentData?.demoActions || []
-                                : []
-                        }
-                        // @ts-ignore Using props that may not be in the type definition yet
+                        actions={panelActions} // Pass the determined actions
                         historyChangedCallback={handleHistoryChanged}
-                        // If agent data has its own responseCompleteCallback, use that, otherwise use our local one
-                        // @ts-ignore Using props that may not be in the type definition yet
                         responseCompleteCallback={agentData?.responseCompleteCallback || handleResponseComplete}
-                        // @ts-ignore Using props that may not be in the type definition yet
                         followOnPrompt={followOnPrompt[agent.id] || null}
-                        // @ts-ignore Using props that may not be in the type definition yet
                         onFollowOnPromptSent={() => setFollowOnPrompt(agent.id, null)}
                       />
                     </div>
