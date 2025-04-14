@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useAgent, AgentContextData } from '../context/AgentContext';
+import { useAgent } from '../context/AgentContext';
 import { examples, ExampleConfig } from '../lib/examples';
 import ReactMarkdown from 'react-markdown';
 
@@ -16,24 +16,6 @@ const cleanQuotedValue = (value: string): string => {
   
   // For non-list values, just remove outer quotes
   return value.replace(/^["']|["']$/g, '');
-};
-
-// Helper function to get a friendly field name (adapted for display on button)
-const getFriendlyFieldName = (path: string): string => {
-  const pathParts = path.split('.');
-  const field = pathParts.length > 1 ? pathParts[1] : path;
-
-  const fieldNames: Record<string, string> = {
-    'responsePattern': 'Response Pattern',
-    'regexPattern': 'Regex Pattern',
-    'responseType': 'Response Type',
-    'style': 'Style',
-    'flags': 'Flags',
-    'callback': 'Callback',
-    'markdown': 'Markdown',
-    'css': 'CSS',
-  };
-  return fieldNames[field] || field;
 };
 
 // Track last log time to avoid spamming
@@ -134,7 +116,7 @@ const processAgentConfigElements = (
 };
 
 export function EmbeddedAgent() {
-  const { updateAgentContextData, agentContextData } = useAgent();
+  const { updateAgentContextData } = useAgent();
 
   // --- Define ALL state variables first ---
   const [buttonFormat, setButtonFormat] = useState('');
@@ -145,7 +127,6 @@ export function EmbeddedAgent() {
   const [flags, setFlags] = useState('');
   const [callback, setCallback] = useState('');
   const [responseType, setResponseType] = useState('button');
-  const [previewContent, setPreviewContent] = useState('');
   const [currentCss, setCurrentCss] = useState(() => {
     const saved = localStorage.getItem('currentCss');
     return saved || '';
@@ -169,12 +150,11 @@ export function EmbeddedAgent() {
     flags: setFlags,
     callback: setCallback,
     responseType: setResponseType,
-    // Add any other state fields that need to be updatable by the agent
   }), [setButtonFormat, setRegex, setMarkdown, setCss, setStyle, setFlags, setCallback, setResponseType]);
 
   // --- Action Callback and Actions Definition ---
   const configActionCallback = useCallback(() => {
-    console.log('[EmbeddedAgent] configActionCallback triggered'); // Log callback trigger
+    console.log('[EmbeddedAgent] configActionCallback triggered');
     setTimeout(() => {
       processAgentConfigElements(stateSetters);
     }, 50);
@@ -183,14 +163,11 @@ export function EmbeddedAgent() {
   // Updated agentConfigActions with improved pattern and style
   const agentConfigActions = useMemo(() => [
     {
-      // Improved pattern that may match even inside pre/code elements
       pattern: "\\<\\<formContext:\\s*(agentConfigContext\\.[\\w\\.]+)\\s*\\|\\s*([\\s\\S]*?)\\>\\>", 
       type: 'button',
       callback: configActionCallback,
-      // Match format in Onboarding.tsx
       markdown: '$1: $2',  
-      // Ensure style class is correctly applied and visible
-      style: 'form-context', // Match the style from Onboarding.tsx
+      style: 'form-context',
       flags: "gm"
     }
   ], [configActionCallback]);
@@ -208,29 +185,22 @@ export function EmbeddedAgent() {
       responseType: responseType,
     };
 
-    // Pass an updater function to updateAgentContextData, explicitly typing prevAgentData
-    updateAgentContextData('llmaserviceinfo', (prevAgentData: any) => ({ // Use any or a more specific type if known
+    updateAgentContextData('llmaserviceinfo', (prevAgentData: any) => ({
       ...(prevAgentData || {}),
       agentConfigContext, 
       agentConfigActions
     }));
-
-    // Keep agentContextData *removed* from this specific effect's dependencies
   }, [buttonFormat, regex, markdown, css, style, flags, callback, responseType, agentConfigActions, updateAgentContextData]);
 
-  // --- Dynamic Processing Hooks (Adapted from Onboarding) ---
-  // Initial + Interval Processing (May cause duplicate listeners if not careful)
+  // --- Dynamic Processing Hooks ---
   useEffect(() => {
     const process = () => {
-        processAgentConfigElements(stateSetters);
+      processAgentConfigElements(stateSetters);
     };
     
-    // Run on mount
     process();
     
-    // Reduce interval frequency to 1 second instead of 300ms
     const interval = setInterval(process, 1000);
-    
     return () => clearInterval(interval);
   }, [stateSetters]);
 
@@ -241,7 +211,6 @@ export function EmbeddedAgent() {
       mutations.forEach(mutation => {
         mutation.addedNodes.forEach(node => {
           if (node instanceof Element && (node.matches('.form-context:not(.form-context-processed)') || node.querySelector('.form-context:not(.form-context-processed)'))) {
-            console.log('[EmbeddedAgent] MutationObserver detected relevant node addition.'); // Log observer trigger
             shouldTransform = true;
           }
         });
@@ -251,12 +220,8 @@ export function EmbeddedAgent() {
       }
     });
 
-    console.log('[EmbeddedAgent] Setting up MutationObserver.'); // Log observer setup
     observer.observe(document.body, { childList: true, subtree: true });
-    return () => {
-        console.log('[EmbeddedAgent] Disconnecting MutationObserver.'); // Log observer cleanup
-        observer.disconnect();
-    }
+    return () => observer.disconnect();
   }, [stateSetters]);
 
   // --- Existing Effects & Handlers ---
@@ -278,40 +243,6 @@ export function EmbeddedAgent() {
     setFlags(example.flags || '');
     setCallback(example.callback || '');
   };
-
-  useEffect(() => {
-    try {
-      const regexPattern = new RegExp(regex, flags || undefined);
-      const regexMatches = regexPattern.test(buttonFormat);
-      
-      if (regexMatches) {
-        // Process regex captures if they exist
-        let processedMarkdown = markdown;
-        let processedCss = css;
-        
-        const matches = buttonFormat.match(regexPattern);
-        if (matches && matches.length > 1) {
-          // Replace $1, $2, etc. in markdown with actual captured values
-          processedMarkdown = markdown.replace(/\$(\d+)/g, (match, group) => {
-            const groupNum = parseInt(group, 10);
-            return matches[groupNum] || match;
-          });
-          
-          processedCss = css.replace(/\$(\d+)/g, (match, group) => {
-            const groupNum = parseInt(group, 10);
-            return matches[groupNum] || match;
-          });
-        }
-        
-        setPreviewContent(`${processedMarkdown}<style>${processedCss}</style>`);
-      } else {
-        setPreviewContent(buttonFormat);
-      }
-    } catch (e) {
-      console.warn('[EmbeddedAgent] Error creating regex pattern:', e);
-      setPreviewContent(buttonFormat);
-    }
-  }, [buttonFormat, regex, markdown, css, flags]);
 
   useEffect(() => {
     try {
