@@ -1,16 +1,20 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
-type AgentType = 'sales' | 'onboarding' | 'llmaserviceinfo' | null;
+export type AgentType = 'sales' | 'onboarding' | 'llmaserviceinfo' | null;
 
 export interface AgentContextData {
   [agentId: string]: any;
 }
 
+// Define the type for the updater function
+type AgentContextUpdater = (prevData: AgentContextData) => AgentContextData;
+
 interface AgentContextType {
   activeAgent: AgentType;
   setActiveAgent: (agent: AgentType) => void;
   agentContextData: AgentContextData;
-  updateAgentContextData: (agentId: string, data: any) => void;
+  // Update the type definition to accept data OR an updater function
+  updateAgentContextData: (agentId: string, dataOrUpdater: any | ((prevAgentData: any) => any)) => void;
   followOnPrompt: {[agentId: string]: string | null};
   setFollowOnPrompt: (agentId: string, prompt: string | null) => void;
   prospectName: string | null;
@@ -31,12 +35,19 @@ export function AgentProvider({ children }: { children: ReactNode }) {
   const [prospectEmail, setProspectEmailState] = useState<string | null>(null);
   const [prospectCompany, setProspectCompanyState] = useState<string | null>(null);
 
-  // Use useCallback to maintain stable function reference
-  const updateAgentContextData = useCallback((agentId: string, data: any) => {
-    setAgentContextData(prevData => ({
-      ...prevData,
-      [agentId]: data
-    }));
+  const updateAgentContextData = useCallback((agentId: string, dataOrUpdater: any | ((prevAgentData: any) => any)) => {
+    setAgentContextData(prevData => {
+      const currentAgentData = prevData[agentId] || {};
+      // Check if dataOrUpdater is a function
+      const newData = typeof dataOrUpdater === 'function' 
+        ? dataOrUpdater(currentAgentData) // Call updater with current agent data
+        : dataOrUpdater; // Use the data directly
+      
+      return {
+        ...prevData,
+        [agentId]: newData // Update only the specific agent's data
+      };
+    });
   }, []);
 
   const setFollowOnPrompt = useCallback((agentId: string, prompt: string | null) => {
